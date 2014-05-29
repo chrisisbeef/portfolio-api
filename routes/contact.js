@@ -8,7 +8,11 @@ module.exports = {
             var contact = JSON.parse(request.payload);
 
             db.collection('posts').insert({name: contact.name, email: contact.email, message: contact.message}, {w:1}, function(err, result) {
-                reply({"status": "success"});
+                if (!err) {
+                    reply({"status": "success"});
+                } else {
+                    reply({"status": "error", "message": err});
+                }
             });
         } catch(error) {
             reply({"status": "error", "message": error});
