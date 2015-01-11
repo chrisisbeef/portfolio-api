@@ -1,20 +1,24 @@
 FROM andreasrs/arch:latest
 MAINTAINER Andreas Søvik <arsovik@gmail.com>
 
-# update container packages
-RUN pacman -Syu --noconfirm
-
-# update pacman db if needed
-RUN pacman-db-upgrade
-
-# nodejs
-RUN pacman -S --noconfirm nodejs
+# update container packages and install node + its non privelidged user
+RUN pacman -Syu --noconfirm \
+        && pacman-db-upgrade \
+        && pacman -S --noconfirm nodejs \
+        && useradd -ms /bin/bash node
 
 # copy code to container
 COPY . /src
 
+# node user permissions
+RUN chown -R node:node /src
+
 # workdir
 WORKDIR /src
+
+# user
+USER node
+ENV HOME /home/node
 
 # install app
 RUN npm install
